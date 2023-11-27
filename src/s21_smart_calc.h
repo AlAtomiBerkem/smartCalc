@@ -31,6 +31,7 @@ typedef enum {
     ERROR_NULL = 0,
     ERROR_1 = 1,
     ERROR_PARSER = 2,
+    ERROR_STAPLE = 3,
 } cod_error;
 
 typedef enum {
@@ -43,32 +44,20 @@ typedef enum {
     UNAR_P_M_PR = 6,
     } priority_t;
 
-// typedef struct stack_double {
-//     double number; 
-//     stack_doube *next_number;
-// } stack_doube;
-
-// typedef struct stack_char {
-//     char simbol;
-//     int priority;
-//     stack_char *next_simbol;
-// } stack_char;
-
-
-//int s21_calculator(s21_stack **double_stack, s21_stack **char_sack  );
-
 typedef struct s21_stack {
     priority_t priority;
     double number;
     type_t simbol;
-    s21_stack *next_pointer;
+    struct s21_stack *next_pointer;
     } s21_stack;
 
- cod_error s21_parser(char *string, s21_stack **parser_stack);
-// s21_transfer_stack(s21_stack transfer_stack);
-cod_error s21_revers_polish_notation(s21_stack rpn_stack, s21_stack rpn_result);
+cod_error s21_parser(char *string, s21_stack **parser_stack);
+cod_error s21_transfer_stack(s21_stack **input_stack);
+cod_error s21_revers_polish_notation(s21_stack *rpn_stack, s21_stack **rpn_result);
 cod_error s21_calculate(s21_stack ready_result);
 s21_stack *create_node(priority_t priority, double number, type_t simbol);
 void push_stack(s21_stack *node, s21_stack **head );
 cod_error pop_stack(s21_stack **head);
 cod_error staple(char *string);
+void parser_print(s21_stack *stack);
+int check_func(const char* input_string, const char* string_to_check, int size);
