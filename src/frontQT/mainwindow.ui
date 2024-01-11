@@ -617,8 +617,8 @@ QPushButton:pressed {
    <widget class="QLineEdit" name="x_input">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>540</y>
+      <x>490</x>
+      <y>520</y>
       <width>181</width>
       <height>51</height>
      </rect>

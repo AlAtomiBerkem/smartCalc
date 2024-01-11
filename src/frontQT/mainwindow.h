@@ -22,6 +22,7 @@ public:
     char* maindata;
     char* x_input;
 
+
 private slots:
     void numbers();
     void AC();
@@ -31,7 +32,7 @@ private slots:
     void search_dot();
     void unar_operator();
 
-    void on_pushButton_result_clicked();
+ void on_pushButton_result_clicked();
 
 private:
     Ui::MainWindow *ui;

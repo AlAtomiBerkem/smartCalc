@@ -73,4 +73,4 @@ cod_error staple(char *string);
 cod_error ready_calculate(s21_stack *ready, double *result);
 void parser_print(s21_stack *stack);
 int check_func(const char* input_string, const char* string_to_check, int size);
-int smart_calc(char *input_str, char* x, double *result);
+cod_error smart_calc(char *input_str, double x, double *result);

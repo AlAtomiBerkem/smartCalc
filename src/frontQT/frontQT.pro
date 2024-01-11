@@ -14,6 +14,7 @@ SOURCES += \
     QCustomPlot.cpp \
     ../s21_smart_calc.c
 
+
 HEADERS += \
     mainwindow.h \
     QCustomPlot.h \

@@ -141,7 +141,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::on_pushButton_result_clicked()
 {
     QByteArray main_display = ui->result_show ->toPlainText().toLocal8Bit();
