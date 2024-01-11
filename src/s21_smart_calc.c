@@ -370,7 +370,7 @@ int smart_calc(char *input_str, char* x, double *result) {
 
 // int main() {
 //   char *string =
-//       "cos(35))^2+(sin(35))^2";  // Входное математическое выражение // 23+34-cos(4^3)-+2\0
+//       "21+21-21*21/21^2%21";  // Входное математическое выражение // 23+34-cos(4^3)-+2\0
 //   // char *string = "6-5+1+2"; // Входное математическое выражение //
 //   // 23+34-cos(4^3)-+2\0
 //   double result = 0.0;
@@ -385,3 +385,106 @@ int smart_calc(char *input_str, char* x, double *result) {
 
 //   return 0;
 // }
+
+
+cod_error deposit_calc(deposit_t *depos, double *diff, double *tax_sum,
+                    double *final_sum) {
+  cod_error res = ERROR_NULL;
+  double start_summ = depos->summ;
+  double need_tax = depos->tax_rate / 100;
+  double total_tax = 0;
+  double total_minus = 0;
+  double period_int_rate =
+      depos->interest_rate / (1200 / (int)(depos->payment_period));
+  double month_int_rate = period_int_rate / (int)(depos->payment_period);
+  int count_of_payments = depos->month / (int)(depos->payment_period);
+  double total_win = 0;
+  int i;
+  double total_add = 0;
+  for (i = 0; i < count_of_payments; i++) {
+    for (int j = 0; j < 3; j++) {
+      if (depos->dates_of_adding[j] > 0) {
+        int add_checker =
+            ((depos->dates_of_adding[j]) / (int)(depos->payment_period));
+        if (add_checker <= i) {
+          depos->summ += depos->sizes_of_adding[j];
+          total_add += depos->sizes_of_adding[j];
+          depos->sizes_of_adding[j] = 0;
+        }
+      }
+      if (depos->dates_of_remove[j] > 0) {
+        int remove_checker =
+            ((depos->dates_of_remove[j]) / (int)(depos->payment_period));
+        if (remove_checker <= i) {
+          depos->summ -= depos->size_of_remove[j];
+          total_minus += depos->size_of_remove[j];
+          depos->size_of_remove[j] = 0;
+        }
+      }
+    }
+    if (depos->summ > 0) {
+      total_tax += ((period_int_rate)*depos->summ) * need_tax;
+      if (depos->capitalization == ON)
+        depos->summ += ((period_int_rate)*depos->summ) * (1 - need_tax);
+      else if (depos->capitalization == OFF)
+        total_win += ((period_int_rate)*depos->summ) * (1 - need_tax);
+    } else
+      res = ERROR_1;
+  }
+  total_win += depos->summ * (1 - need_tax) *
+               (depos->month - (i * depos->payment_period)) * month_int_rate;
+  total_tax += depos->summ * need_tax *
+               (depos->month - (i * depos->payment_period)) * month_int_rate;
+  if (depos->capitalization == ON) {
+    *final_sum = depos->summ;
+    *tax_sum = total_tax;
+    *diff = depos->summ - (start_summ - total_minus + total_add);
+  }
+  if (depos->capitalization == OFF) {
+    *final_sum = depos->summ;
+    *tax_sum = total_tax;
+    *diff = total_win;
+  }
+  return res;
+}
+cod_error credit_calc(double summ, int month, double interest_rate,
+                   creadit_type type, double *month_payment_min,
+                   double *month_payment_max, double *total_payment,
+                   double *over_payment) {
+  cod_error res = ERROR_NULL;
+  if (summ > 0 && month > 0 && interest_rate > 0) {
+    double non_porc_rate = (interest_rate / 1200) + 1;
+    if (type == DIFF)
+      credit_diff(summ, month, non_porc_rate, month_payment_min,
+                  month_payment_max, total_payment, over_payment);
+    else if (type == ANNUITY)
+      creadit_ann(summ, month, non_porc_rate, month_payment_min,
+                  month_payment_max, total_payment, over_payment);
+  } else
+    res = ERROR_1;
+  return res;
+}
+
+void credit_diff(double summ, int month, double interest_rate,
+                 double *month_payment_min, double *month_payment_max,
+                 double *total_payment, double *over_payment) {
+  double static_payment = summ / month, to_calc_over = summ;
+  for (int i = 0; i < month; i++) {
+    double curr_proc = summ * (interest_rate - 1);
+    if (i == 0) *month_payment_max = curr_proc + static_payment;
+    if (i == month - 1) *month_payment_min = curr_proc + static_payment;
+    summ -= static_payment;
+    *total_payment += curr_proc + static_payment;
+  }
+  *over_payment = *total_payment - to_calc_over;
+}
+
+void creadit_ann(double summ, int month, double interest_rate,
+                 double *month_payment_min, double *month_payment_max,
+                 double *total_payment, double *over_payment) {
+  *month_payment_max = summ * (interest_rate - 1) * pow(interest_rate, month) /
+                       (pow(interest_rate, month) - 1);
+  *month_payment_min = *month_payment_max;
+  *total_payment = month * (*month_payment_min);
+  *over_payment = (*total_payment) - summ;
+}
