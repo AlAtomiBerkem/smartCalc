@@ -38,15 +38,15 @@ int main() {
 
 START_TEST(binary_calculation_test) {
   double result = 0;
-  int status = smart_calc(test_binary_calculation_ok[_i], 6, &result);
-  ck_assert_double_eq_tol(result, binary_calculation_result[_i], 1e-1);
+  int status = smart_calc(test_binary_calculation_ok[_i], "10", &result);
+  ck_assert_double_eq_tol(result, binary_calculation_result[_i],1e-1);
   ck_assert_int_eq(status, 0);
 }
 END_TEST
 
 START_TEST(function_calculation_test) {
   double result = 0;
-  int status = smart_calc(test_function_calculation[_i], 6, &result);
+  int status = smart_calc(test_function_calculation[_i], "10", &result);
   ck_assert_double_eq_tol(result, function_calculation_result[_i], 1e-5);
   ck_assert_int_eq(status, 0);
 }
@@ -202,7 +202,7 @@ Suite *test_smart_calculation() {
   Suite *s = suite_create("\033[42m-=SMART_CALC_TESTS_RESULT=-\033[0m");
   TCase *tc = tcase_create("SMART_CALC_TESTS_RESULT");
   suite_add_tcase(s, tc);
-  tcase_add_loop_test(tc, binary_calculation_test, 0, 5);
+  tcase_add_loop_test(tc, binary_calculation_test, 0, 10);
   // tcase_add_loop_test(tc, function_calculation_test, 0, 10);
   tcase_add_test(tc, division_by_zero_test);
   return s;

@@ -161,5 +161,80 @@ void MainWindow::on_pushButton_result_clicked()
         QString result_string = QString::number(result);
         ui->result_show->setPlainText(result_string);
     }
+
+
+
+    void MainWindow::on_radioButton_DIFF_clicked() { type = DIFF; }
+
+    void MainWindow::on_radioButton_ANN_clicked() { type = ANNUITY; }
+
+    void MainWindow::on_pushButton_clicked() {
+      ui->label_credit_over->setText("");
+      ui->label_credit_total->setText("");
+      ui->label_credit_max->setText("");
+      ui->label_credit_min->setText("");
+      ui->label_credit_diff->setText("");
+      errors res = OK;
+      double min = 0, max = 0, total = 0, over = 0;
+      double *month_payment_min = &min, *month_payment_max = &max,
+             *total_payment = &total, *over_payment = &over;
+      res = credit_calc(ui->doubleSpinBox->value(), ui->doubleSpinBox_2->value(),
+                        ui->doubleSpinBox_3->value(), type, month_payment_min,
+                        month_payment_max, total_payment, over_payment);
+      if (res == OK) {
+        ui->label_credit_over->setText(QString::number(over, 'g', 10));
+        ui->label_credit_total->setText(QString::number(total, 'g', 10));
+        ui->label_credit_max->setText(QString::number(max, 'g', 10));
+        ui->label_credit_min->setText(QString::number(min, 'g', 10));
+        ui->label_credit_diff->setText(QString::number((max - min), 'g', 10));
+      }
+    }
+
+    void MainWindow::on_pushButton_10_clicked() {
+      ui->label_20->setText("");
+      ui->label_21->setText("");
+      ui->label_22->setText("");
+      errors res = OK;
+      payments_type pay_type = YEAR;
+      deposit_t date = {0,   0,         0,         0,         YEAR,
+                        OFF, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+      deposit_t *node = &date;
+      node->summ = ui->doubleSpinBox_8->value();
+      node->month = ui->doubleSpinBox_5->value();
+      node->interest_rate = ui->doubleSpinBox_7->value();
+      node->tax_rate = ui->doubleSpinBox_4->value();
+      if (ui->comboBox->currentIndex() == 0) pay_type = YEAR;
+      if (ui->comboBox->currentIndex() == 1) pay_type = HALF_YEAR;
+      if (ui->comboBox->currentIndex() == 2) pay_type = QUARTER;
+      if (ui->comboBox->currentIndex() == 3) pay_type = MONTH;
+      node->payment_period = pay_type;
+      node->dates_of_adding[0] = ui->doubleSpinBox_11->value();
+      node->dates_of_adding[1] = ui->doubleSpinBox_13->value();
+      node->dates_of_adding[2] = ui->doubleSpinBox_10->value();
+      node->sizes_of_adding[0] = ui->doubleSpinBox_15->value();
+      node->sizes_of_adding[1] = ui->doubleSpinBox_16->value();
+      node->sizes_of_adding[2] = ui->doubleSpinBox_18->value();
+      node->dates_of_remove[0] = ui->doubleSpinBox_12->value();
+      node->dates_of_remove[1] = ui->doubleSpinBox_9->value();
+      node->dates_of_remove[2] = ui->doubleSpinBox_14->value();
+      node->size_of_remove[0] = ui->doubleSpinBox_17->value();
+      node->size_of_remove[1] = ui->doubleSpinBox_19->value();
+      node->size_of_remove[2] = ui->doubleSpinBox_20->value();
+      node->capitalization = type_cap;
+      double diff_v = 0, tax_sum_v = 0, final_sum_v = 0;
+      double *diff = &diff_v, *tax_sum = &tax_sum_v, *final_sum = &final_sum_v;
+      res = deposit_calc(node, diff, tax_sum, final_sum);
+      if (res == OK) {
+        ui->label_20->setText(QString::number(final_sum_v, 'g', 10));
+        ui->label_21->setText(QString::number(tax_sum_v, 'g', 10));
+        ui->label_22->setText(QString::number(diff_v, 'g', 10));
+      }
+    }
+
+    void MainWindow::on_radioButton_clicked() { type_cap = OFF; }
+
+    void MainWindow::on_radioButton_2_clicked() { type_cap = ON; }
+
+
 }
 
