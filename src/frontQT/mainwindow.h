@@ -2,6 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QVector>
+
+extern "C"{
+#include "../s21_smart_calc.h"
+}
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,6 +19,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    char* maindata;
+    char* x_input;
 
 private slots:
     void numbers();
@@ -23,6 +30,8 @@ private slots:
     void search_staple();
     void search_dot();
     void unar_operator();
+
+    void on_pushButton_result_clicked();
 
 private:
     Ui::MainWindow *ui;

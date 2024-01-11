@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,10 +10,14 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    QCustomPlot.cpp \
+    ../s21_smart_calc.c
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    QCustomPlot.h \
+    ../s21_smart_calc.h
 
 FORMS += \
     mainwindow.ui

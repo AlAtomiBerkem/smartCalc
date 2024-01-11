@@ -11,10 +11,12 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QWidget>
+#include "qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -53,6 +55,9 @@ public:
     QPushButton *pushButton_4;
     QPushButton *pushButton_DEL;
     QPushButton *pushButton_AC;
+    QCustomPlot *widget;
+    QPushButton *pushButton_result;
+    QLineEdit *x_input;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -280,7 +285,16 @@ public:
 "}"));
         pushButton_AC = new QPushButton(centralwidget);
         pushButton_AC->setObjectName(QString::fromUtf8("pushButton_AC"));
-        pushButton_AC->setGeometry(QRect(540, 0, 171, 161));
+        pushButton_AC->setGeometry(QRect(30, 570, 171, 161));
+        widget = new QCustomPlot(centralwidget);
+        widget->setObjectName(QString::fromUtf8("widget"));
+        widget->setGeometry(QRect(560, 30, 241, 261));
+        pushButton_result = new QPushButton(centralwidget);
+        pushButton_result->setObjectName(QString::fromUtf8("pushButton_result"));
+        pushButton_result->setGeometry(QRect(220, 540, 241, 121));
+        x_input = new QLineEdit(centralwidget);
+        x_input->setObjectName(QString::fromUtf8("x_input"));
+        x_input->setGeometry(QRect(470, 540, 181, 51));
         MainWindow->setCentralWidget(centralwidget);
 
         retranslateUi(MainWindow);
@@ -329,6 +343,7 @@ public:
         pushButton_4->setText(QCoreApplication::translate("MainWindow", "4", nullptr));
         pushButton_DEL->setText(QCoreApplication::translate("MainWindow", "/", nullptr));
         pushButton_AC->setText(QCoreApplication::translate("MainWindow", "AC", nullptr));
+        pushButton_result->setText(QCoreApplication::translate("MainWindow", "=", nullptr));
     } // retranslateUi
 
 };

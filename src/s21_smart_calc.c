@@ -161,70 +161,6 @@ cod_error pop_stack(s21_stack **head) {
   return res;
 }
 
-// #include <stdlib.h>
-// int main() {
-//   s21_stack *input = NULL;
-//   push_stack(create_node(1, 1, COS), &input);
-//   char *string = "23+34-cos(4^3)-+2\0";
-// //   char *string = "23\0";
-//   s21_stack *parser_stack = NULL;
-//   s21_stack *ready_stack = NULL;
-//   //   printf("123\n");
-//   cod_error res = s21_parser(string, &parser_stack);
-//     s21_transfer_stack(&parser_stack);
-
-//   if (res == ERROR_NULL)
-//     parser_print(parser_stack);
-//   else
-//     printf("ERROR");
-//    cod_error s21_revers_polish_notation(s21_stack *parser_stack, s21_stack
-//    *ready_stack);
-//     while (parser_stack != NULL)
-//     {
-//         s21_stack *tmp = parser_stack;
-//         parser_stack = parser_stack->next_pointer;
-//         free(tmp);
-//     }
-
-//   return parser_print;
-// }
-
-// #include <stdio.h>
-// #include <stdlib.h>
-
-// int main() {
-//   // Ваш код для создания parser_stack, наполнения его данными из строки,
-//   // инициализации ready_stack
-
-//   // Ваш код для заполнения parser_stack
-// char *string = "23+34-cos(4^3)-+2\0";
-// //   char *string = "23\0";
-// s21_stack *parser_stack = NULL;
-// s21_stack *ready_stack = NULL;
-// //   printf("123\n");
-// cod_error res = s21_parser(string, &parser_stack);
-// s21_transfer_stack(&parser_stack);
-// // Вызов функции s21_revers_polish_notation для сортировки стека
-// cod_error result = s21_revers_polish_notation(parser_stack,
-// &ready_stack);
-
-// // Проверка на ошибку
-// if (result != ERROR_NULL) {
-//   printf("Error occurred during sorting!");
-//   return 1;
-// }
-
-// // Вывод содержимого отсортированного стека ready_stack с помощью printf
-// printf("Sorted stack contents:\n");
-// while (ready_stack != NULL) {
-//   printf("Priority: %d, Number: %lf, Symbol: %c\n", ready_stack->priority,
-//          ready_stack->number, ready_stack->simbol);
-//   ready_stack = ready_stack->next_pointer;
-// }
-
-//   return 0;
-// }
-
 void parser_print(s21_stack *stack) {
   while (stack != NULL) {
     printf("%f\t%d\t%d\n", stack->number, stack->simbol, stack->priority);
@@ -242,70 +178,7 @@ cod_error s21_transfer_stack(s21_stack **input_stack) {
   }
   *input_stack = output_stack;
 }
-
-// cod_error s21_revers_polish_notation(s21_stack *rpn_stack,
-//                                      s21_stack **rpn_result) {
-//   s21_stack *temp_simbol_stack = NULL;
-//   cod_error res = ERROR_NULL;
-//   while (rpn_stack != NULL) {
-//     if (rpn_stack->priority == NUMBER_X_PR) {
-//       push_stack(create_node(rpn_stack->priority, rpn_stack->number,
-//                              rpn_stack->simbol),
-//                  &temp_simbol_stack);
-//       pop_stack(&rpn_stack);
-//     } else if (rpn_stack->simbol == BKT_LEFT) {
-//       push_stack(create_node(rpn_stack->priority, rpn_stack->number,
-//                              rpn_stack->simbol),
-//                  &temp_simbol_stack);
-//       pop_stack(&rpn_stack);
-//     } else if (rpn_stack->simbol == BKT_RIGHT) {
-//       while (
-//         // temp_simbol_stack != NULL &&
-//              temp_simbol_stack->simbol != BKT_LEFT) {
-//         push_stack(
-//             create_node(temp_simbol_stack->priority, temp_simbol_stack->number,
-//                         temp_simbol_stack->simbol),
-//             rpn_result);
-//         pop_stack(&temp_simbol_stack);
-//       }
-//       pop_stack(&temp_simbol_stack);  // Удаление левой скобки
-//       pop_stack(&rpn_stack);  // Удаление правой скобки
-//     } else if (temp_simbol_stack == NULL) {
-//       push_stack(create_node(rpn_stack->priority, rpn_stack->number,
-//                              rpn_stack->simbol),
-//                  &temp_simbol_stack);
-//       pop_stack(&rpn_stack);
-//     } else {
-//       while (temp_simbol_stack != NULL &&
-//              temp_simbol_stack->priority >= rpn_stack->priority) {
-//         push_stack(
-//             create_node(temp_simbol_stack->priority, temp_simbol_stack->number,
-//                         temp_simbol_stack->simbol),
-//             rpn_result);
-//         pop_stack(&temp_simbol_stack);
-//       }
-//       push_stack(create_node(rpn_stack->priority, rpn_stack->number,
-//                              rpn_stack->simbol),
-//                  &temp_simbol_stack);
-//       pop_stack(&rpn_stack);
-//     }
-//   }
-//   while (temp_simbol_stack != NULL) {
-//     if (temp_simbol_stack->simbol == BKT_LEFT) {
-//       res = ERROR_RPN;  // Найдена лишняя левая скобка
-//       break;
-//     }
-//     push_stack(
-//         create_node(temp_simbol_stack->priority, temp_simbol_stack->number,
-//                     temp_simbol_stack->simbol),
-//         rpn_result);
-//     pop_stack(&temp_simbol_stack);
-//   }
-//   parser_print(*rpn_result);
-//   printf("\n");
-//   return res;
-// }
-
+         
 cod_error s21_revers_polish_notation(s21_stack *rpn_stack,
                                      s21_stack **rpn_result) {
   s21_stack *temp_simbol_stack = NULL;
@@ -472,7 +345,7 @@ cod_error ready_calculate(s21_stack *ready, double *result) {
   return res;
 }
 
-cod_error smart_calc(char *input_str, double x, double *result) {
+int smart_calc(char *input_str, char* x, double *result) {
   char new_str[300] = "\0";
   cod_error res = ERROR_NULL;
   s21_stack *parts = NULL;
@@ -490,46 +363,25 @@ cod_error smart_calc(char *input_str, double x, double *result) {
   }
   return res;
 }
-// cod_error smart_calc(char *input_str, double x, double *result) {
-//   char new_str[300] = "\0";
-//   cod_error res = ERROR_NULL;
-//   s21_stack *parts = NULL;
-//   s21_stack *ready = NULL;
 
-//   res = s21_parser(input_str, &parts);
-//   if (res != ERROR_NULL) {
-//     return res;
-//   }
-//   res = s21_revers_polish_notation(parts, &ready);
-//   if (res != ERROR_NULL) {
-//     return res;
-//   }
-//   //s21_transfer_stack(&ready);
-//   res = ready_calculate(ready, result);
-//   if (res != ERROR_NULL) {
-//     return res;
+
+// #include <stdio.h>
+// #include <stdlib.h>
+
+// int main() {
+//   char *string =
+//       "cos(35))^2+(sin(35))^2";  // Входное математическое выражение // 23+34-cos(4^3)-+2\0
+//   // char *string = "6-5+1+2"; // Входное математическое выражение //
+//   // 23+34-cos(4^3)-+2\0
+//   double result = 0.0;
+//   cod_error res =
+//       smart_calc(string, 0, &result);  // Вычисление результата выражения
+
+//   if (res == ERROR_NULL) {
+//     printf("Результат: %lf\n", result);  // Вывод результата
+//   } else {
+//     printf("Произошла ошибка при вычислении!\n");
 //   }
 
-//   return res;
+//   return 0;
 // }
-
-#include <stdio.h>
-#include <stdlib.h>
-
-int main() {
-  char *string =
-      "21+21-21*21/21^2%21";  // Входное математическое выражение // 23+34-cos(4^3)-+2\0
-  // char *string = "6-5+1+2"; // Входное математическое выражение //
-  // 23+34-cos(4^3)-+2\0
-  double result = 0.0;
-  cod_error res =
-      smart_calc(string, 0, &result);  // Вычисление результата выражения
-
-  if (res == ERROR_NULL) {
-    printf("Результат: %lf\n", result);  // Вывод результата
-  } else {
-    printf("Произошла ошибка при вычислении!\n");
-  }
-
-  return 0;
-}

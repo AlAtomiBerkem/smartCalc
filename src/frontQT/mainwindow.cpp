@@ -141,3 +141,26 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::on_pushButton_result_clicked()
+{
+    QByteArray main_display = ui->result_show ->toPlainText().toLocal8Bit();
+    QByteArray x_display = ui->x_input ->text().toLocal8Bit();
+    maindata = main_display.data();
+    x_input = x_display.data();
+    double result = 0;
+
+    int return_code = smart_calc(maindata, x_input, &result);
+
+    if(return_code == 1) {
+        ui->result_show->setPlainText("Ты криворукий");
+
+    }
+    else if (result == INFINITY || result == -INFINITY || std::isnan(result)) {
+        ui->result_show->setPlainText("Calculation error");
+ } else {
+        QString result_string = QString::number(result);
+        ui->result_show->setPlainText(result_string);
+    }
+}
+
