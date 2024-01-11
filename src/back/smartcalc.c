@@ -1,6 +1,6 @@
 #include "smartcalc.h"
 
-errors validate(char *str, char *new_str) {
+errors validate(char *str, char *new_s) {
   errors res = OK;
   int number_pos = 0, point_exist = 0, bkt_counter = 0, arithmetich_pos = 0,
       can_pointer = 0/*, x_exist = 0*/, bkt_pos = 0, u_min = 0;
@@ -10,8 +10,8 @@ errors validate(char *str, char *new_str) {
   if (strchr(check_arithmetic_st, *str) != 0) res = VALIDATE_ERROR;
   if (*str == ')') res = VALIDATE_ERROR;
   if (*str == '-' || *str == '+') {
-    *new_str++ = '0';
-    *(new_str++) = *(str++);
+    *new_s++ = '0';
+    *(new_s++) = *(str++);
   }
   while (res == OK && *str) {
     if (*str == '(') {
@@ -36,10 +36,10 @@ errors validate(char *str, char *new_str) {
       can_pointer = 0;
       bkt_pos = 0;
     }
-    *(new_str++) = *(str++);
+    *(new_s++) = *(str++);
     if (*(str - 1) == '(' && (*(str) == '-' || *(str) == '+')) {
       u_min = 1;
-      *new_str++ = '0';
+      *new_s++ = '0';
     }
     if (bkt_pos == 1 && strchr(check_arithmetic, *str) && u_min == 0)
       res = VALIDATE_ERROR;
@@ -129,33 +129,33 @@ errors parser(t_stack **head, char *str, double x_value) {
   return res;
 }
 
-errors s21_rpn(t_stack **ready, t_stack *input) {
+errors s21_rpn(t_stack **ready, t_stack *input_rnp) {
   errors res = OK;
   t_stack *support = NULL;
-  while (input != NULL) {
-    if (input->priority == DIGIT_X_PRIORITY) {
-      s21_push(ready, input->value, input->priority, input->type);
-      s21_pop(&input);
-    } else if (input->type == BKT_LEFT) {
-      s21_push(&support, input->value, input->priority, input->type);
-      s21_pop(&input);
-    } else if (input->type == BKT_RIGHT) {
+  while (input_rnp != NULL) {
+    if (input_rnp->priority == DIGIT_X_PRIORITY) {
+      s21_push(ready, input_rnp->value, input_rnp->priority, input_rnp->type);
+      s21_pop(&input_rnp);
+    } else if (input_rnp->type == BKT_LEFT) {
+      s21_push(&support, input_rnp->value, input_rnp->priority, input_rnp->type);
+      s21_pop(&input_rnp);
+    } else if (input_rnp->type == BKT_RIGHT) {
       while (support->type != BKT_LEFT) {
         s21_push(ready, support->value, support->priority, support->type);
         s21_pop(&support);
       }
       s21_pop(&support);
-      s21_pop(&input);
+      s21_pop(&input_rnp);
     } else if (support == NULL) {
-      s21_push(&support, input->value, input->priority, input->type);
-      s21_pop(&input);
+      s21_push(&support, input_rnp->value, input_rnp->priority, input_rnp->type);
+      s21_pop(&input_rnp);
     } else {
-      while (support != NULL && support->priority >= input->priority) {
+      while (support != NULL && support->priority >= input_rnp->priority) {
         s21_push(ready, support->value, support->priority, support->type);
         s21_pop(&support);
       }
-      s21_push(&support, input->value, input->priority, input->type);
-      s21_pop(&input);
+      s21_push(&support, input_rnp->value, input_rnp->priority, input_rnp->type);
+      s21_pop(&input_rnp);
     }
   }
   while (support != NULL) {
@@ -239,11 +239,11 @@ errors calculate_funcs(t_stack **number_stack, t_stack **operator_stack) {
 }
 
 errors smart_calc(char *input_str, double x, double *result) {
-  char new_str[300] = "\0";
-  errors res = validate(input_str, new_str);
+  char new_s[300] = "\0";
+  errors res = validate(input_str, new_s);
   t_stack *parts = NULL;
   t_stack *ready = NULL;
-  if (res == OK) res = parser(&parts, new_str, x);
+  if (res == OK) res = parser(&parts, new_s, x);
   if (res == OK) res = s21_rpn(&ready, parts);
   if (res == OK) {
     transfer(&ready);
@@ -251,6 +251,16 @@ errors smart_calc(char *input_str, double x, double *result) {
   }
   return res;
 }
+
+void transfer(t_stack **head) {
+  t_stack *tmp = NULL;
+  while ((*head) != NULL) {
+    s21_push(&tmp, (*head)->value, (*head)->priority, (*head)->type);
+    s21_pop(head);
+  }
+  *head = tmp;
+}
+
 
 errors credit_calc(double summ, int month, double interest_rate,
                    creadit_type type, double *month_payment_min,
@@ -355,15 +365,6 @@ errors deposit_calc(deposit_t *depos, double *diff, double *tax_sum,
   return res;
 }
 
-void s21_push(t_stack **head, double value, op_priority priority,
-              lex_type type) {
-  t_stack *tmp = (t_stack *)calloc(1, sizeof(t_stack));
-  tmp->value = value;
-  tmp->type = type;
-  tmp->priority = priority;
-  tmp->next = (*head);
-  (*head) = tmp;
-}
 
 errors s21_pop(t_stack **head) {
   errors res = OK;
@@ -375,6 +376,17 @@ errors s21_pop(t_stack **head) {
     res = POP_ERROR;
   return res;
 }
+
+void s21_push(t_stack **head, double value, op_priority priority,
+              lex_type type) {
+  t_stack *tmp = (t_stack *)calloc(1, sizeof(t_stack));
+  tmp->value = value;
+  tmp->type = type;
+  tmp->priority = priority;
+  tmp->next = (*head);
+  (*head) = tmp;
+}
+
 
 t_stack *create_node(const double value, op_priority priority, lex_type type,
                      errors *res) {
@@ -400,128 +412,3 @@ void s21_push_at_head(t_stack **head, t_stack *node_to_insert) {
     last_node->next = node_to_insert;
   }
 }
-
-void transfer(t_stack **head) {
-  t_stack *tmp = NULL;
-  while ((*head) != NULL) {
-    s21_push(&tmp, (*head)->value, (*head)->priority, (*head)->type);
-    s21_pop(head);
-  }
-  *head = tmp;
-}
-
-// void print_node_list(t_stack *head) {
-//   t_stack *tmp = head;
-//   int i = 1;
-//   printf("-----START-----\n");
-//   while (tmp != NULL) {
-//     printf("i - %d\t", i++);
-//     printf("v - %lf\t", tmp->value);
-//     printf("pr - %d\t", tmp->priority);
-//     printf("type - %d\n", tmp->type);
-//     tmp = tmp->next;
-//   }
-//   printf("------END------\n");
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-
-    connect (ui -> pushButton_0, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_1, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_2, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_3, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_4, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_5, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_6, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_7, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_8, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_9, SIGNAL(clicked()), this, SLOT(numbers()));
-
-    connect (ui -> pushButton_X, SIGNAL(clicked()), this, SLOT(numbers()));
-
-    connect (ui -> pushButton_AC, SIGNAL(clicked()), this, SLOT(AC()));
-    connect (ui -> pushButton_DOT, SIGNAL(clicked()), this, SLOT(bi_operator()));
-
-    connect (ui -> pushButton_PLUS, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_MINUS, SIGNAL(clicked()), this, SLOT(bi_operator()));
-
-
-    connect (ui -> pushButton_PLUS, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_MINUS, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_UMN, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_DEL, SIGNAL(clicked()), this, SLOT(bi_operator()));
-
-    connect (ui -> pushButton_BKT_LEFT, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_BKT_RIGHT, SIGNAL(clicked()), this, SLOT(bi_operator()));
-
-
-    connect (ui -> pushButton_MOD, SIGNAL(clicked()), this, SLOT(numbers()));
-    connect (ui -> pushButton_SIN, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_COS, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_TAN, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_ASIN, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_ACOS, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_ATAN, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_SQRT, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_LN, SIGNAL(clicked()), this, SLOT(unar_operator()));
-    connect (ui -> pushButton_POW, SIGNAL(clicked()), this, SLOT(bi_operator()));
-    connect (ui -> pushButton_LOG, SIGNAL(clicked()), this, SLOT(unar_operator()));
-
-}
-
-void MainWindow::numbers(){
-        QString temp_line = ui ->result_show->toPlainText();
-        QPushButton *temp_button = (QPushButton*)sender();
-
-        if (!(ui->result_show->toPlainText().endsWith(")") || ui->result_show->toPlainText().endsWith("X"))){
-        temp_line = temp_line + temp_button->text();
-        ui -> result_show -> setText(temp_line);
-        ui->result_show->setAlignment(Qt::AlignRight);
-        }
-}
-
-void MainWindow::bi_operator(){
-    QString temp_line = ui ->result_show->toPlainText();
-    QPushButton *temp_button = (QPushButton*)sender();
-
-    if (){
-    temp_line = temp_line + temp_button->text();
-    ui -> result_show -> setText(temp_line);
-    ui->result_show->setAlignment(Qt::AlignRight);
-    }
-}
-
-void MainWindow::AC() {
-    QString temp_line = "";
-    ui -> result_show -> setText(temp_line);
-    ui->result_show->setAlignment(Qt::AlignRight);
-
-}
-
-int MainWindow:: search_type();
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
